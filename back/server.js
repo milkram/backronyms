@@ -13,6 +13,8 @@ const io = socket(server);
 // Init bodyParser
 const bodyParser = require('body-parser');
 
+var port = process.env.PORT || 3100;
+
 // ------------------------------------------------- //
 
 // MIDDLEWARE, make sure it's at the top of the server
@@ -118,7 +120,7 @@ io.on('connection', socket => {
 });
 
 // Init server on *:3100
-server.listen(3100, () => {
-	console.log('Serving on *:3100');
+server.listen(port, () => {
+	console.log('Serving on ' + port);
 	console.log('Press CTRL+C to abort...')
 });
