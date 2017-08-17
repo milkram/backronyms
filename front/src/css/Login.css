@@ -1,0 +1,34 @@
+.inline-block {
+	display: inline-block;
+}
+
+.no-margins {
+	margin: 0;
+}
+
+.form-header {
+	margin: 0 10px 0 0;
+}
+
+#horizontal-rule {
+	width: 50%;
+	margin-bottom: 20px;
+}
+
+#form-container {
+	margin: 40px 0px;
+	/* border-bottom: solid thin black; */
+}
+
+#start-button {
+	display: block;
+	margin: 10px auto 0px auto;
+}
+
+#link-join-game{
+	text-decoration: none;
+}
+
+#link-join-game:visited {
+	color: black;
+}

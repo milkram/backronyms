@@ -1,0 +1,26 @@
+#horizontal-rule {
+	width: 50%;
+	margin-bottom: 20px;
+}
+
+.form-header {
+	margin: 0 10px 0 0;
+}
+
+#start-button {
+	display: block;
+	margin: 10px auto 0px auto;
+}
+
+#change-room-code-button {
+	display: block;
+	margin: 10px auto 0px auto;
+}
+
+#link-start-game{
+	text-decoration: none;
+}
+
+#link-start-game:visited {
+	color: black;
+}
