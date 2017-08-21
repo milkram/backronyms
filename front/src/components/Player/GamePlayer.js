@@ -1,11 +1,11 @@
 import React from 'react';
 // import axios from 'axios';
 import './css/GamePlayer.css';
+import GameLogic from '../GameLogic'
 import StateLobbyPregame from './LobbyPregame'
-import StateGameStart from './GameStart'
-
-// import { Link } from 'react-router';
-// import Player from './components/Player'
+import StateGameStarting from './GameStarting'
+import StateGameStartJudge from './GameStartJudge'
+import StateGameStartPlayer from './GameStartPlayer'
 
 let socket = {};
 
@@ -19,8 +19,9 @@ class GamePlayer extends React.Component {
 			// List of States:
 			// ---------------------- //
 			// * lobbyPregame
-			// * gameStart
-			// * 
+			// * gameStarting (game about to start, wait everyone)
+			// * gameStartJudge ('you are the judge!')
+			// * gameStartPlayer ('you are the player, wait up')
 		}
 
 		// Bindings
@@ -34,7 +35,8 @@ class GamePlayer extends React.Component {
 		this.setState({
 			'room': {
 				'roomCode': '',
-				'host' : '',
+				'host': '',
+				'currentJudgeName': '',
 				'players': []
 			}
 		}, () => {
@@ -45,34 +47,64 @@ class GamePlayer extends React.Component {
 
 	setSocketListeners() {
 		// When the host officially starts the game from
-		//  the waiting lobby, change state to 'gameStart'
+		//  the waiting lobby, change state to 'gameStarting'
 		socket.on('host:game-intro-starting', data => {
 			this.setState({
-				'gameState' : 'gameStart'
+				'gameState': 'gameStarting'
 			})
-		})		
+		})
 
 		socket.on('host:start-game', data => {
 			console.log('>> host:start-game');
 		})
+
+		socket.on('host:round-start', (judgeSocketID, judgeName) => {
+			console.log('>> host:round-start');
+
+			// Setting the name of the judge in state
+			this.setState({
+				'currentJudgeName': judgeName
+			});
+
+			// Display a different state depending on what was
+			//  randomly selected from within GameHost.js
+			if (judgeSocketID === socket.id) {
+				this.setState({
+					'gameState': 'gameStartJudge'
+				})
+			}
+			else {
+				this.setState({
+					'gameState': 'gameStartPlayer'
+				})
+			}
+		})
 	}
 
-	render (){
+	render() {
 		let toRender;
 		switch (this.state.gameState) {
 			default: {
 				toRender = <div>default, fix this</div>
 				break;
 			}
-			case 'lobbyPregame':{
+			case 'lobbyPregame': {
 				toRender = <StateLobbyPregame />
 				break;
 			}
-			case 'gameStart':{
-				toRender = <StateGameStart />
+			case 'gameStarting': {
+				toRender = <StateGameStarting />
 				break;
 			}
-		}		
+			case 'gameStartJudge': {
+				toRender = <StateGameStartJudge />
+				break;
+			}
+			case 'gameStartPlayer': {
+				toRender = <StateGameStartPlayer judgeName={this.state.currentJudgeName}/>
+				break;
+			}
+		}
 		return (
 			<div>
 				{toRender}

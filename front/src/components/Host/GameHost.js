@@ -57,11 +57,13 @@ class GameHost extends React.Component {
 				},()=>{
 					socket.emit('host:game-intro-starting',this.state.room.roomCode);
 
-					console.log("running");
-
-					GameLogic.hello()
+					// Transition into the start game logic,
+					//  with a 3000ms delay in between
+					GameLogic.startGame(3000,this.state.room.players)
 						.then(res=>{
-							console.log(res);
+							// When the game start is complete, emit that the res
+							//  the judge of the game
+							socket.emit('host:round-start',this.state.room.roomCode,res.socket,res.name);
 						})
 						.catch(err=>{
 							console.log(err);

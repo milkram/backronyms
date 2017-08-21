@@ -86,6 +86,10 @@ io.on('connection', socket => {
 		socket.to(roomCode).emit('host:game-intro-starting');
 	})
 
+	socket.on('host:round-start', (roomCode, judgeSocketID, judgeName) => {
+		socket.to(roomCode).emit('host:round-start', judgeSocketID, judgeName);
+	});
+
 	// When a player attempts to join a room...
 	socket.on('player:join-room', data => {
 		console.log('>> player:join-room: ' + data.roomCode + ' (pending)')
