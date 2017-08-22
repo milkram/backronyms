@@ -16,30 +16,16 @@ let startGame = (time, players) => {
 	})
 }
 
-let startRoundTimer = () => {
-	return new Promise(function (resolve, reject) {
-		setTimeout(() => {
-
-			console.log('gamelogic.startRoundTimer!')
-
-			resolve(
-				'hurray!'
-			);
-		}, 5000);
-	})
-}
-
 let generateBackronym = (lf) => {
 	let backronym = [];
 
 	// Determine how many letters the backronym will be
-	let len = Math.floor(Math.random() * 3) + 3;
+	let len = Math.floor(Math.random() * 3) + 2;
 
 	// Determine what letters the backronym will start with
 	for (let i = 0; i < len; i++) {
 		let rand = Math.floor(Math.random() * 100000) + 1;
 		let tally = 0;
-		let letter = 's'; // s by default
 
 		// console.log(rand);
 
@@ -48,13 +34,81 @@ let generateBackronym = (lf) => {
 			// console.log(key);          // the name of the current key.
 			// console.log(lf[key]);   // the value of the current key.
 
-			if (rand > tally && rand <= lf[key]+tally){
+			if (rand > tally && rand <= lf[key] + tally) {
 				backronym.push(key);
 			}
 			tally += lf[key];
 		});
 	}
 	return backronym.join('');
+}
+
+let checkBackronym = (backronym, entry, existingSubmission) => {
+
+
+	// console.log(`backronym: ${backronym}`);
+	// console.log(`entry: ${entry}`);
+
+	// Final return boolean
+	// let isEntryValid = true;
+
+	// Checking if there's any entry
+	if (entry === '') {
+		return {
+			'valid': false,
+			'message': 'please enter a backronym',
+			'code': 400
+		}
+	}
+
+	// Checking if the entry is exactly the same as an old submission
+	if (entry === existingSubmission) {
+		return {
+			'valid': false,
+			'code': 300
+		}
+	}
+
+	// Method to eliminate unnecessary whitespace
+	String.prototype.allTrim = String.prototype.allTrim ||
+		function () {
+			return this.replace(/\s+/g, ' ')
+				.replace(/^\s+|\s+$/, '')
+				.replace(/\s+$/, '');
+		};
+
+	// Split up both the backronym and the entry so it can be assessed
+	let backronymSplit = backronym.toLowerCase().split("");
+	let entrySplit = entry.toLowerCase().allTrim().split(" ");
+
+	// console.log(`backronymSplit: ${backronymSplit}`);
+	// console.log(`entrySplit: ${entrySplit}`);
+
+	if (backronymSplit.length !== entrySplit.length) {
+		console.log('FALSE: not the same amount of words')
+		return {
+			'valid': false,
+			'message': 'invalid backronym submitted, try again',
+			'code': 401
+		};
+	}
+	for (let i = 0; i < backronymSplit.length; i++) {
+		// Checking if the first letters match
+		if (entrySplit[i][0] !== backronymSplit[i]) {
+			console.log('FALSE: first letters don\'t match');
+			return {
+				'valid': false,
+				'message': 'invalid backronym submitted, try again',
+				'code': 402
+			};
+		}
+	}
+
+	return {
+		'valid': true,
+		'entry': entry.allTrim(),
+		'code': 200
+	};
 }
 
 // Player/Judge/Game Methods
@@ -86,7 +140,8 @@ let GameLogicObj = {
 	shuffleCategories: shuffleCategories,
 	presentCategoryChoices: presentCategoryChoices,
 	generateBackronym: generateBackronym,
-	startRoundTimer: startRoundTimer
+	checkBackronym: checkBackronym
+	// startRoundTimer: startRoundTimer
 }
 
 export default GameLogicObj;

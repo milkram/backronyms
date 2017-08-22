@@ -1,0 +1,15 @@
+#submit-button {
+	display: block;
+	margin: 0 auto;
+	padding: 0;
+}
+
+#form {
+	display: block;
+	margin: 0 auto;
+	padding: 0;
+}
+
+#error-text {
+	color: red;
+}

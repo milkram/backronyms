@@ -32,6 +32,7 @@ class GameHost extends React.Component {
 		this.startGame = this.startGame.bind(this);
 		this.getCategories = this.getCategories.bind(this);
 		this.getLetterFrequencies = this.getLetterFrequencies.bind(this);
+		this.timerComplete = this.timerComplete.bind(this);		
 	}
 
 	componentDidMount() {
@@ -44,6 +45,7 @@ class GameHost extends React.Component {
 				'host': '',
 				'currentCategory': '',
 				'currentBackronym': '',
+				'currentJudge': '',
 				'players': []
 			}
 		}, () => {
@@ -76,6 +78,10 @@ class GameHost extends React.Component {
 			})
 	}
 
+	timerComplete() {
+
+	}
+
 	startGame() {
 		this.setState({
 			'gameState': 'gameIntro'
@@ -90,9 +96,14 @@ class GameHost extends React.Component {
 					//  the judge of the game, as well as the choices of categories
 					let categoryChoices = GameLogic.presentCategoryChoices(this.state.categories, this.state.categoryHead);
 
+					// Set the currentJudge in the 'room'
+					let modifiedRoom = this.state.room;
+					modifiedRoom.currentJudge = res.name;
+
 					// Set the new category head position
 					this.setState({
-						'categoryHead': this.state.categoryHead + 3
+						'categoryHead': this.state.categoryHead + 3,
+						'room' : modifiedRoom
 					})
 
 					socket.emit('host:round-start', this.state.room.roomCode, res.socket, res.name, categoryChoices);
@@ -119,11 +130,9 @@ class GameHost extends React.Component {
 				socket: data.socket
 			})
 			// In the parent 'room' object, add in the modifiedPlayers array
-			modifiedRoom = {
-				'roomCode': this.props.roomCode.toLowerCase(),
-				'host': socket.id,
-				'players': modifiedPlayers
-			}
+			modifiedRoom.roomCode = this.props.roomCode.toLowerCase();
+			modifiedRoom.host = socket.id;
+			modifiedRoom.players = modifiedPlayers;
 
 			// Set to state the newly modifiedRoom
 			this.setState({
@@ -142,10 +151,8 @@ class GameHost extends React.Component {
 
 			// Fetch and modify the current room information to change the category
 			let modifiedRoom = this.state.room;
-			modifiedRoom = {
-				'currentCategory': category,
-				'currentBackronym' : backronym
-			}
+			modifiedRoom.currentCategory = category;
+			modifiedRoom.currentBackronym = backronym;
 
 			// Save state
 			this.setState({
@@ -171,7 +178,9 @@ class GameHost extends React.Component {
 				break;
 			}
 			case 'roundStart': {
-				toRender = <StateRoundStart category={this.state.room.currentCategory} backronym={this.state.room.currentBackronym} startRoundTimer={GameLogic.startRoundTimer}/>
+				toRender = (
+					<StateRoundStart category={this.state.room.currentCategory} backronym={this.state.room.currentBackronym} timerComplete={this.timerComplete} judgeName={this.state.room.currentJudge}/>
+				)
 				break;
 			}
 		}

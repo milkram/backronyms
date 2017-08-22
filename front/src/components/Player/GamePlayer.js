@@ -1,13 +1,14 @@
 import React from 'react';
 // import axios from 'axios';
 import './css/GamePlayer.css';
-// import GameLogic from '../GameLogic'
+import GameLogic from '../GameLogic'
 import StateLobbyPregame from './LobbyPregame'
 import StateRoundStarting from './RoundStarting'
 import StateRoundStartJudge from './RoundStartJudge'
 import StateRoundStartPlayer from './RoundStartPlayer'
 import StateRoundActiveJudge from './RoundActiveJudge'
 import StateRoundActivePlayer from './RoundActivePlayer'
+import StateRoundInProgress from './RoundInProgress'
 
 let socket = {};
 
@@ -16,11 +17,13 @@ class GamePlayer extends React.Component {
 		super();
 
 		this.state = {
+			'player' : {},
 			'roomCode': '',
 			'gameState': 'lobbyPregame',
 			'categoryChoices': [],
 			'category': '',
-			'backronym': ''
+			'backronym': '',
+			'currentJudge': {}
 			// 'letterFrequencies' : {}
 			// List of States:
 			// ---------------------- //
@@ -33,10 +36,15 @@ class GamePlayer extends React.Component {
 		// Bindings
 		this.setSocketListeners = this.setSocketListeners.bind(this);
 		this.selectCategory = this.selectCategory.bind(this);
+		this.checkForCategoryAndBackronym = this.checkForCategoryAndBackronym.bind(this);
+		this.submitBackronym = this.submitBackronym.bind(this);
 	}
 
 	componentDidMount() {
 		socket = this.props.socket;
+
+		console.log("ya");
+		console.log(socket);
 
 		// Initialize the state
 		this.setState({
@@ -50,14 +58,15 @@ class GamePlayer extends React.Component {
 		// this.getLetterFrequencies();
 	}
 
-	// getLetterFrequencies() {
-	// 	axios.get('http://localhost:3100/letterfreqs')
-	// 		.then(res => {
-	// 			this.setState({
-	// 				'letterFrequencies': res.data
-	// 			})
-	// 		})
-	// }
+	checkForCategoryAndBackronym() {
+		// If the category and the backronym fields are filled in
+		//  within state, advance the game state to 'playing'
+		if (this.state.backronym !== '' && this.state.category !== '') {
+			this.setState({
+				'gameState': 'roundInProgress'
+			})
+		}
+	}
 
 	setSocketListeners() {
 		// When the host officially starts the game from
@@ -66,16 +75,15 @@ class GamePlayer extends React.Component {
 			console.log(`>> host:game-intro-starting`);
 		});
 
-		// socket.on('host:start-game', data => {
-		// 	console.log(`>> host:start-game: ${JSON.stringify(data)}`);
-		// });
-
 		socket.on('host:round-start', (judgeSocketID, judgeName, categoryChoices) => {
 			console.log(`>> host:round-start: ${judgeSocketID}, ${judgeName}, ${JSON.stringify(categoryChoices)}`);
 
 			// Setting the name of the judge in state
 			this.setState({
-				'currentJudgeName': judgeName
+				'currentJudge': {
+					'name': judgeName,
+					'socketID': judgeSocketID
+				}
 			});
 
 			// Display a different state depending on what was
@@ -93,27 +101,79 @@ class GamePlayer extends React.Component {
 			}
 		});
 
-		socket.on('judge:select-category', name => {
-			console.log(`>> judge:select-category: ${name}`);
+		socket.on('judge:select-category', category => {
+			console.log(`>> judge:select-category: ${category}`);
+
+			this.setState({
+				'category': category
+			}, () => {
+				this.checkForCategoryAndBackronym();
+			})
 		});
 
-		socket.on('host:generate-backronym', backronym =>{
+		socket.on('host:generate-backronym', backronym => {
 			console.log(`>> host:generate-backronym: ${backronym}`)
+
+			this.setState({
+				'backronym': backronym
+			}, () => {
+				this.checkForCategoryAndBackronym();
+			})
 		});
 	}
 
 	// When the judge selects the category out of the three choices
-	selectCategory(name) {
-		socket.emit('judge:select-category', this.state.roomCode, name);
+	selectCategory(category) {
+		socket.emit('judge:select-category', this.state.roomCode, category);
 		this.setState({
-			'category': name
+			'category': category
 		});
 	}
 
-	// makeBackronym(){
-	// 	// Generate the backronym for the round
-	// 	let backronym = GameLogic.generateBackronym(this.state.letterFrequencies);
+	// // When a player hands in their backronym, pass it off to
+	// //  GameLogic.js to see if it's approved
+	// submitBackronym2(event,backronym) {
+	// 	// Prevent default functionality of the submit button
+	// 	event.preventDefault();
+
+	// 	if (GameLogic.checkBackronym(backronym) === true){
+	// 		// If GameLogic approves of the submitted backronym,
+	// 		//  officially submit it			
+	// 	}
+	// 	else {
+	// 		// ...else reject the submission
+
+	// 	}
+	// 	console.log(backronym);
 	// }
+
+	submitBackronym(event, entry, existingSubmission) {
+		// Prevent default functionality of the submit button
+		event.preventDefault();
+
+		// Return a promise
+		return new Promise((resolve, reject) => {
+			let returnObj = GameLogic.checkBackronym(this.state.backronym, entry, existingSubmission);
+			if (returnObj.valid === true) {
+
+				socket.emit('player:submit-backronym',()=>{
+					console.log(`>> player:submit-backronym: ${entry}`)
+				});
+
+				resolve({
+					'entry': returnObj.entry,
+					'code': returnObj.code
+				});
+			}
+			else {
+				reject({
+					'valid': false,
+					'message': returnObj.message,
+					'code' : returnObj.code
+				});
+			}
+		})
+	}
 
 	render() {
 		let toRender;
@@ -135,7 +195,7 @@ class GamePlayer extends React.Component {
 				break;
 			}
 			case 'gameStartPlayer': {
-				toRender = <StateRoundStartPlayer judgeName={this.state.currentJudgeName} />
+				toRender = <StateRoundStartPlayer judgeName={this.state.currentJudge.name} />
 				break;
 			}
 			case 'gameActiveJudge': {
@@ -143,7 +203,11 @@ class GamePlayer extends React.Component {
 				break;
 			}
 			case 'gameActivePlayer': {
-				toRender = <StateRoundActivePlayer judgeName={this.state.currentJudgeName} />
+				toRender = <StateRoundActivePlayer judgeName={this.state.currentJudge.name} />
+				break;
+			}
+			case 'roundInProgress': {
+				toRender = <StateRoundInProgress socketID={socket.id} judge={{ 'name': this.state.currentJudge.name, 'socketID': this.state.currentJudge.socketID }} category={this.state.category} backronym={this.state.backronym} submitBackronym={this.submitBackronym} />
 				break;
 			}
 		}
