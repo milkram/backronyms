@@ -13,7 +13,6 @@ class App extends Component {
 			roomInput: '',
 			nameInput: '',
 			roomCode: '',
-			// socket: {}
 		}
 
 		// Init bindings
@@ -44,6 +43,7 @@ class App extends Component {
 	}
 	
 	startHosting() {
+		// Connect the hosting client
 		socket = io('http://localhost:3100');
 		socket.connect();
 		socket.emit('host:make-room', this.state.roomCode.toLowerCase());
@@ -101,7 +101,7 @@ class App extends Component {
 						'nameInput': this.state.nameInput,
 						'joinRoom': this.joinRoom,
 						// Game+Host Clients
-						'socket' : socket
+						'socket' : socket,
 						// Game Client Specific
 						// Host Client Specific
 						 })}

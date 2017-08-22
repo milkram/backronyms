@@ -26,7 +26,7 @@ function StateListeningForConnections(props) {
 
 	// The Ready button -- advances the game forward to another state
 	let readyButtonJSX = (
-		<button onClick={props.advanceGameState}>start game!</button>
+		<button onClick={props.startGame}>start game!</button>
 	)
 
 	return (

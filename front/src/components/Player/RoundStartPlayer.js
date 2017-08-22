@@ -1,7 +1,7 @@
 import React from 'react';
-import './css/GameStartPlayer.css';
+import './css/RoundStartPlayer.css';
 
-function StateGameStartPlayer(props) {
+function StateRoundStartPlayer(props) {
 	return (
 		<div>
 			<h1>{props.judgeName} is the judge!</h1>
@@ -10,4 +10,4 @@ function StateGameStartPlayer(props) {
 	)
 }
 
-export default StateGameStartPlayer;
+export default StateRoundStartPlayer;

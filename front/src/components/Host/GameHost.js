@@ -1,8 +1,8 @@
 import React from 'react';
-// import axios from 'axios';
-// import './css/GameHost.css';
+import axios from 'axios';
 import StateListeningForConnections from './ListeningForConnections'
 import StateGameIntro from './GameIntro'
+import StateRoundStart from './RoundStart'
 import GameLogic from '../GameLogic'
 
 // import { Link } from 'react-router';
@@ -15,19 +15,23 @@ class GameHost extends React.Component {
 		super();
 
 		this.state = {
-			// 'hostSocket': {},
 			'room': {},
 			'gameState': 'listeningForConnections',
+			'letterFrequencies': {},
+			'categories': [],
+			'categoryHead': 0
 			// List of States:
 			// ---------------------- //
-			// * waitingForConnections
+			// * listeningForConnections
 			// * gameIntro
 			// * 
 		}
 
 		// Bindings
 		this.setSocketListeners = this.setSocketListeners.bind(this);
-		this.advanceGameState = this.advanceGameState.bind(this);
+		this.startGame = this.startGame.bind(this);
+		this.getCategories = this.getCategories.bind(this);
+		this.getLetterFrequencies = this.getLetterFrequencies.bind(this);
 	}
 
 	componentDidMount() {
@@ -37,41 +41,66 @@ class GameHost extends React.Component {
 		this.setState({
 			'room': {
 				'roomCode': '',
-				'host' : '',
+				'host': '',
+				'currentCategory': '',
+				'currentBackronym': '',
 				'players': []
 			}
 		}, () => {
-			// After the host socket is created, 
+			// After the host socket is created
 			this.setSocketListeners();
 		})
+
+		// Fetch the categories from the server
+		this.getCategories();
+
+		// Fetch the current letter frequencies from the server
+		this.getLetterFrequencies();
 	}
 
-	advanceGameState(){
-		switch (this.state.gameState){
-			default:{
-				break;
-			}
-			case 'listeningForConnections':{
+	getCategories() {
+		axios.get('http://localhost:3100/categories')
+			.then(res => {
 				this.setState({
-					'gameState': 'gameIntro'
-				},()=>{
-					socket.emit('host:game-intro-starting',this.state.room.roomCode);
+					'categories': GameLogic.shuffleCategories(res.data)
+				});
+			});
+	}
 
-					// Transition into the start game logic,
-					//  with a 3000ms delay in between
-					GameLogic.startGame(3000,this.state.room.players)
-						.then(res=>{
-							// When the game start is complete, emit that the res
-							//  the judge of the game
-							socket.emit('host:round-start',this.state.room.roomCode,res.socket,res.name);
-						})
-						.catch(err=>{
-							console.log(err);
-						})
-					});
-				break;
-			}
-		}
+	getLetterFrequencies() {
+		axios.get('http://localhost:3100/letterfreqs')
+			.then(res => {
+				this.setState({
+					'letterFrequencies': res.data
+				})
+			})
+	}
+
+	startGame() {
+		this.setState({
+			'gameState': 'gameIntro'
+		}, () => {
+			socket.emit('host:game-intro-starting', this.state.room.roomCode);
+
+			// Transition into the start game logic,
+			//  with a 3000ms delay in between
+			GameLogic.startGame(3000, this.state.room.players)
+				.then(res => {
+					// When the game start is complete, emit that the res
+					//  the judge of the game, as well as the choices of categories
+					let categoryChoices = GameLogic.presentCategoryChoices(this.state.categories, this.state.categoryHead);
+
+					// Set the new category head position
+					this.setState({
+						'categoryHead': this.state.categoryHead + 3
+					})
+
+					socket.emit('host:round-start', this.state.room.roomCode, res.socket, res.name, categoryChoices);
+				})
+				.catch(err => {
+					console.log(err);
+				})
+		});
 	}
 
 	setSocketListeners() {
@@ -102,7 +131,28 @@ class GameHost extends React.Component {
 			});
 
 			// Push the data onto the server..?
-		})
+		});
+
+		socket.on('judge:select-category', category => {
+			console.log(`>> judge:select-category: ${JSON.stringify(category)}`);
+
+			// Generate the backronym for the round
+			let backronym = GameLogic.generateBackronym(this.state.letterFrequencies);
+			socket.emit('host:generate-backronym', this.state.room.roomCode, backronym);
+
+			// Fetch and modify the current room information to change the category
+			let modifiedRoom = this.state.room;
+			modifiedRoom = {
+				'currentCategory': category,
+				'currentBackronym' : backronym
+			}
+
+			// Save state
+			this.setState({
+				gameState: 'roundStart',
+				room: modifiedRoom
+			})
+		});
 	}
 
 	render() {
@@ -113,15 +163,16 @@ class GameHost extends React.Component {
 				break;
 			}
 			case 'listeningForConnections': {
-				toRender = <StateListeningForConnections room={this.state.room} advanceGameState={this.advanceGameState}/>
+				toRender = <StateListeningForConnections room={this.state.room} startGame={this.startGame} />
 				break;
 			}
-			case 'gameIntro':{
-				toRender = <StateGameIntro room={this.state.room} advanceGameState={this.advanceGameState}/>
+			case 'gameIntro': {
+				toRender = <StateGameIntro room={this.state.room} />
 				break;
 			}
-			case '':{
-
+			case 'roundStart': {
+				toRender = <StateRoundStart category={this.state.room.currentCategory} backronym={this.state.room.currentBackronym} startRoundTimer={GameLogic.startRoundTimer}/>
+				break;
 			}
 		}
 
