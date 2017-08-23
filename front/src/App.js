@@ -70,7 +70,8 @@ class App extends Component {
 		for (var i = 0; i < 4; i++) {
 			text += possible.charAt(Math.floor(Math.random() * possible.length));
 		}
-		axios.get('http://localhost:3100/make/' + text)
+		// axios.get('http://localhost:3100/make/' + text)
+		axios.get('/make/' + text)
 			.then(res => {
 				this.setState({
 					roomCode: text
