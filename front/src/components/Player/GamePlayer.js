@@ -9,6 +9,7 @@ import StateRoundStartPlayer from './RoundStartPlayer'
 import StateRoundActiveJudge from './RoundActiveJudge'
 import StateRoundActivePlayer from './RoundActivePlayer'
 import StateRoundInProgress from './RoundInProgress'
+import StatePlayerVoting from './PlayerVoting'
 
 let socket = {};
 
@@ -17,13 +18,14 @@ class GamePlayer extends React.Component {
 		super();
 
 		this.state = {
-			'player' : {},
+			'player': {},
 			'roomCode': '',
 			'gameState': 'lobbyPregame',
 			'categoryChoices': [],
 			'category': '',
 			'backronym': '',
-			'currentJudge': {}
+			'currentJudge': {},
+			'submissions' : []
 			// 'letterFrequencies' : {}
 			// List of States:
 			// ---------------------- //
@@ -43,9 +45,6 @@ class GamePlayer extends React.Component {
 	componentDidMount() {
 		socket = this.props.socket;
 
-		console.log("ya");
-		console.log(socket);
-
 		// Initialize the state
 		this.setState({
 			'roomCode': this.props.roomInput.toLowerCase()
@@ -53,9 +52,6 @@ class GamePlayer extends React.Component {
 			// After the host socket is created, 
 			this.setSocketListeners();
 		})
-
-		// Fetch the current letter frequencies from the server
-		// this.getLetterFrequencies();
 	}
 
 	checkForCategoryAndBackronym() {
@@ -120,6 +116,15 @@ class GamePlayer extends React.Component {
 				this.checkForCategoryAndBackronym();
 			})
 		});
+
+		socket.on('host:submission-round-complete', (submissions) => {
+			console.log(`>> host:submission-round-complete`);
+
+			this.setState({
+				'gameState' : 'playerVoting',
+				'submissions' : submissions
+			})
+		})
 	}
 
 	// When the judge selects the category out of the three choices
@@ -130,23 +135,8 @@ class GamePlayer extends React.Component {
 		});
 	}
 
-	// // When a player hands in their backronym, pass it off to
-	// //  GameLogic.js to see if it's approved
-	// submitBackronym2(event,backronym) {
-	// 	// Prevent default functionality of the submit button
-	// 	event.preventDefault();
-
-	// 	if (GameLogic.checkBackronym(backronym) === true){
-	// 		// If GameLogic approves of the submitted backronym,
-	// 		//  officially submit it			
-	// 	}
-	// 	else {
-	// 		// ...else reject the submission
-
-	// 	}
-	// 	console.log(backronym);
-	// }
-
+	// When a player hands in their backronym, pass it off to
+	//  GameLogic.js to see if it's approved	
 	submitBackronym(event, entry, existingSubmission) {
 		// Prevent default functionality of the submit button
 		event.preventDefault();
@@ -156,9 +146,8 @@ class GamePlayer extends React.Component {
 			let returnObj = GameLogic.checkBackronym(this.state.backronym, entry, existingSubmission);
 			if (returnObj.valid === true) {
 
-				socket.emit('player:submit-backronym',()=>{
-					console.log(`>> player:submit-backronym: ${entry}`)
-				});
+				// Submit to the server the verified backronym
+				socket.emit('player:submit-backronym', this.state.roomCode, returnObj.entry, socket.id);
 
 				resolve({
 					'entry': returnObj.entry,
@@ -169,7 +158,7 @@ class GamePlayer extends React.Component {
 				reject({
 					'valid': false,
 					'message': returnObj.message,
-					'code' : returnObj.code
+					'code': returnObj.code
 				});
 			}
 		})
@@ -208,6 +197,10 @@ class GamePlayer extends React.Component {
 			}
 			case 'roundInProgress': {
 				toRender = <StateRoundInProgress socketID={socket.id} judge={{ 'name': this.state.currentJudge.name, 'socketID': this.state.currentJudge.socketID }} category={this.state.category} backronym={this.state.backronym} submitBackronym={this.submitBackronym} />
+				break;
+			}
+			case 'playerVoting' : {
+				toRender = <StatePlayerVoting submissions={this.state.submissions}/>
 				break;
 			}
 		}
