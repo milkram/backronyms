@@ -2,6 +2,8 @@
 const express = require('express');
 const app = express();
 
+const path = require('path');
+
 // Init 'http' and run server
 const http = require('http');
 const server = http.Server(app);
@@ -14,6 +16,8 @@ const io = socket(server);
 const bodyParser = require('body-parser');
 
 var port = process.env.PORT || 3100;
+
+app.use(express.static(path.resolve(__dirname + './../front/build')));
 
 // ------------------------------------------------- //
 
@@ -230,10 +234,34 @@ io.on('connection', socket => {
 		io.to(roomCode).emit('judge:select-category', category);
 	})
 
+	// When the new backronym is determined...
 	socket.on('host:generate-backronym', (roomCode, backronym) => {
 		console.log(`>> [${roomCode}] host:generate-backronym: ${backronym}`)
 		socket.to(roomCode).emit('host:generate-backronym', backronym);
 	})
+
+	// When the player submits a valid backronym...
+	socket.on('player:submit-backronym', (roomCode, backronym, socketID) => {
+		console.log(`>> [${roomCode}] player:submit-backronym: backronym: ${backronym} (${socketID})`);
+
+		for (let i = 0; i < rooms.length; i++) {
+			if (rooms[i].roomCode === roomCode) {
+				// Send the data to the host of the found roomCode
+				socket.to(rooms[i].host).emit('player:submit-backronym', backronym, socketID);
+				break;
+			}
+		}
+	})
+
+	// When the submissions round is complete (either via timer or via everyone finishing ahead of time)...
+	socket.on('host:submission-round-complete', (roomCode, submissions, totalPlayers) => {
+		console.log(`>> [${roomCode}] host:submission-round-complete: : (${submissions.length}/${totalPlayers})`);
+		socket.to(roomCode).emit('host:submission-round-complete', submissions);
+	})
+});
+
+app.get('*',(req,res)=>{
+	res.sendFile(path.resolve(__dirname + './../front/build/index.html'));
 });
 
 // Init server on *:3100
