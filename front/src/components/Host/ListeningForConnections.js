@@ -82,7 +82,7 @@ class StateListeningForConnections extends React.Component {
 				</ul>				
 				{horizontalRuleJSX}
 				{instructionsJSX}
-				{(_playersInRoom >= 1) ? readyButtonJSX : <div></div>}
+				{(_playersInRoom >= 3) ? readyButtonJSX : <div></div>}
 			</div>
 		)
 	}
