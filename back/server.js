@@ -178,10 +178,11 @@ io.on('connection', socket => {
 	// When the host has successfully made a new, unique room,
 	//  have that socket 'join' the room. Also add a new entry to
 	//  the 'rooms' array that contains the room information
-	socket.on('host:make-room', room => {
-		console.log(`>> [${room}] host:make-room`);
-		socket.join(room);
-		rooms.push({ 'roomCode': room, 'host': socket.id, 'players': [] });
+	socket.on('host:make-room', roomCode => {
+		console.log(`>> [${roomCode}] host:make-room`);
+		socket.join(roomCode);
+		rooms.push({ 'roomCode': roomCode, 'host': socket.id, 'players': [] });
+		io.to(socket.id).emit('host:make-room',roomCode);
 	});
 
 	// When the host presses the 'start game' button,

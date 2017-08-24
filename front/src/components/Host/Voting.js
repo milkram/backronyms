@@ -9,16 +9,17 @@ function StateVoting(props) {
 		)
 	})
 
-	let horizontalRuleJSX = props.round.submissions.length > 0 ? <hr /> : <div></div>;
+	let horizontalRuleJSX = props.round.submissions.length > 0 ? <hr className='horizontal-rule' /> : <div></div>;
 
 	return (
 		<div>
 			<h1>voting round!</h1>
-			<BarTimer duration={30000} onBarTimerComplete={props.votingTimerComplete} />
-			<hr />
-			<p style={{ 'margin': 0 }}><strong>category</strong>: {props.round.category}</p>
-			<p style={{ 'margin': 0 }}><strong>backronym</strong>: {props.round.backronym.toUpperCase()}</p>
-			<p style={{ 'margin': 0 }}><strong>judge</strong>: {props.round.judge.name}</p>
+			<BarTimer duration={30000} onBarTimerComplete={props.votingTimerComplete}/>
+			{/* <hr className='horizontal-rule' /> */}
+			<div id='description-container'>
+				<p className='subtext' style={{marginTop:'18px'}}><strong>category</strong>: {props.round.category}</p>
+				<p className='subtext' style={{marginBottom:'18px'}}><strong>judge</strong>: {props.round.judge.name}</p>
+			</div>
 			{horizontalRuleJSX}
 			<ul>
 				{resultsJSX}

@@ -1,0 +1,9 @@
+.subtext {
+	margin: 0;
+	text-align: left;
+}
+
+#description-container {
+	width: 33%;
+	margin: 0 auto;
+}

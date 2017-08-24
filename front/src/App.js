@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './css/App.css';
 import io from 'socket.io-client';
 import axios from 'axios';
+import GameLogic from './components/GameLogic'
 // import { Link } from 'react-router';
 
 let socket = {};
@@ -41,7 +42,7 @@ class App extends Component {
 			nameInput: newNameInput
 		})
 	}
-	
+
 	startHosting() {
 		// Connect the hosting client
 		socket = io('http://localhost:3100');
@@ -50,19 +51,56 @@ class App extends Component {
 		socket.emit('host:make-room', this.state.roomCode.toLowerCase());
 	}
 
-	joinRoom() {
-		// Using a regex to check if this.state.roomInput is
-		//  4 characters and uses only consonants
-		if (/^[bcdfghjklmnpqrstvwxyz]{4}$/.test(this.state.roomInput.toLowerCase()) && this.state.nameInput !== '') {
-			socket = io('http://localhost:3100');
-			// socket = io('54.218.83.100');
-			socket.connect();
-			socket.emit('player:join-room', {
-				'roomCode': this.state.roomInput.toLowerCase(),
-				'name': this.state.nameInput
-				// 'socket' : socket -- this causes an error
-			});
-		}
+	joinRoom(event) {
+		// Prevent default functionality of the submit button
+		event.preventDefault();
+
+		// Return a promise
+		return new Promise((resolve, reject) => {
+			let isValid = GameLogic.checkJoinInput(this.state.roomInput.toLowerCase(),this.state.nameInput);
+			if (isValid === true) {
+				socket = io('http://localhost:3100');
+				// socket = io('54.218.83.100');
+				socket.connect();
+				socket.emit('player:join-room', {
+					'roomCode': this.state.roomInput.toLowerCase(),
+					'name': this.state.nameInput
+					// 'socket' : socket -- this causes an error
+				});
+
+				resolve(true);
+
+				// // Using a regex to check if this.state.roomInput is
+				// //  4 characters and uses only consonants
+				// if (/^[bcdfghjklmnpqrstvwxyz]{4}$/.test(this.state.roomInput.toLowerCase()) && this.state.nameInput !== '') {
+				// 	socket = io('http://localhost:3100');
+				// 	// socket = io('54.218.83.100');
+				// 	socket.connect();
+				// 	socket.emit('player:join-room', {
+				// 		'roomCode': this.state.roomInput.toLowerCase(),
+				// 		'name': this.state.nameInput
+				// 		// 'socket' : socket -- this causes an error
+				// 	});
+				// }
+
+				// // Submit to the server the verified backronym
+				// socket.emit('player:submit-backronym', this.state.roomCode, returnObj.entry, socket.id);
+
+				// resolve({
+				// 	'entry': returnObj.entry,
+				// 	'code': returnObj.code
+				// });
+			}
+			else {
+				reject(false);
+
+				// reject({
+				// 	'valid': false,
+				// 	'message': returnObj.message,
+				// 	'code': returnObj.code
+				// });
+			}
+		})
 	}
 
 	setNewRoomCode() {
@@ -73,7 +111,7 @@ class App extends Component {
 			text += possible.charAt(Math.floor(Math.random() * possible.length));
 		}
 		axios.get('http://localhost:3100/make/' + text)
-		// axios.get('/make/' + text)
+			// axios.get('/make/' + text)
 			.then(res => {
 				this.setState({
 					roomCode: text
@@ -93,7 +131,7 @@ class App extends Component {
 		return (
 			<div className="App">
 				<div>
-					{React.cloneElement(this.props.children, { 
+					{React.cloneElement(this.props.children, {
 						// Home Page
 						'roomCode': this.state.roomCode,
 						'setNewRoomCode': this.setNewRoomCode,
@@ -104,10 +142,10 @@ class App extends Component {
 						'nameInput': this.state.nameInput,
 						'joinRoom': this.joinRoom,
 						// Game+Host Clients
-						'socket' : socket
+						'socket': socket
 						// Game Client Specific
 						// Host Client Specific
-						 })}
+					})}
 				</div>
 			</div>
 		);

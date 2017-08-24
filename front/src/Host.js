@@ -3,8 +3,17 @@ import { Link } from 'react-router';
 import './css/Host.css';
 
 function Home (props) {
+	let headerJSX = (
+		<div>
+			<h1 style={{ marginBottom: '0' }}>backronyms</h1>
+			<p style={{ margin: '0' }}>the game of making something from nothing</p>
+			<hr className="horizontal-rule" />
+		</div>
+	);
+
 	return (
 		<div>
+			{headerJSX}
 			<div id="form-container">
 				<div>
 					<h2 className="form-header inline-block">room code:</h2>

@@ -10,6 +10,21 @@
 	padding: 0;
 }
 
+#input {
+	margin-bottom: 20px;
+}
+
 #error-text {
 	color: red;
+}
+
+.description-text {
+	margin: 0;
+	text-align: left;
+	font-size: 0.9em;
+}
+
+.subtext-container {
+	width: 50%;
+	margin: 0 auto;
 }

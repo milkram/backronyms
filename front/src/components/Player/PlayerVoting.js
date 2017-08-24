@@ -15,9 +15,11 @@ class StatePlayerVoting extends React.Component {
 		if (this.state.voteSelected === false) {
 			headerJSX = (
 				<div>
-					<h1>vote for your favourite!</h1>
-					<p>you get more points if your vote matches the judge's vote</p>
-					<hr />
+					<div id='header-container'>
+						<h1>vote for your favourite!</h1>
+						<p className='description-text'>- you'll get more points if your vote matches the judge's vote</p>
+					</div>
+					<hr className='horizontal-rule' />					
 				</div>
 			)
 			renderJSX = this.props.submissions.reduce((acc, el, i) => {
@@ -28,7 +30,7 @@ class StatePlayerVoting extends React.Component {
 							voteSelected: true,
 							entry: el.entry
 						})
-					}}key={i}>{el.entry}</button></li>);
+					}} key={i}>{el.entry}</button></li>);
 				}
 				return acc;
 			}, []);

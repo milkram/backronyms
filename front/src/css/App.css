@@ -18,6 +18,11 @@
   font-size: large;
 }
 
+* .horizontal-rule {
+	width: 50%;
+	margin-bottom: 20px;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

@@ -1,0 +1,29 @@
+.score-container{
+	width: 66%;
+	margin: 0 auto;
+	box-sizing: border-box;
+	margin-bottom: -3px;
+	border-style: solid;
+}
+
+.score-name{
+	width: 33%;
+	display: inline-block;
+	text-align: left;
+}
+
+.score-entry{
+	width: 52%;
+	display: inline-block;
+	text-align: left;
+}
+
+.score-votes {
+	width: 15%;
+	display: inline-block;
+	text-align: right;
+}
+
+#larger-score-container{
+	margin-top: 50px;
+}

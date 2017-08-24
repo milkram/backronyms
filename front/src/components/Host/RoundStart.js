@@ -2,21 +2,27 @@ import React from 'react';
 import './css/RoundStart.css';
 import BarTimer from './../Utility/BarTimer'
 
-function StateRoundStart (props){
-	let whoHasSubmittedJSX = props.submissions.map((el,i)=>{
+function StateRoundStart(props) {
+	let whoHasSubmittedJSX = props.submissions.map((el, i) => {
 		return (
 			<li key={i}>{el.name}</li>
 		)
 	})
 	let horizontalRuleJSX = props.submissions.length > 0 ? <hr /> : <div></div>;
+	let submittedHeaderJSX = whoHasSubmittedJSX.length > 0 ?
+		(
+			<h3 style={{marginBottom:'0'}}>submitted:</h3>
+		)
+		: null;
 
 	return (
 		<div>
 			<h1>{props.backronym.toUpperCase()}</h1>
 			<h1>{props.category}</h1>
-			<h2>{props.judgeName}</h2>
-			<BarTimer duration={60000} onBarTimerComplete={props.timerComplete}/>
+			<h2>judge: {props.judgeName}</h2>
+			<BarTimer duration={60000} onBarTimerComplete={props.timerComplete} />
 			{horizontalRuleJSX}
+			{submittedHeaderJSX}
 			<ul>
 				{whoHasSubmittedJSX}
 			</ul>

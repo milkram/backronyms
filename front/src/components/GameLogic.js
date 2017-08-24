@@ -16,6 +16,22 @@
 // 	})
 // }
 
+// LOBBY METHODS
+let checkJoinInput = (roomInput, input) => {
+	// Checks if a) the roomInput is 4 characters and only consonants
+	//  and b) if the nameInput doesn't contain any special characters or spaces
+	//  (allowed are numbers, letters, dashes, underscores, periods, but no spaces or otherwise)
+	//  c) less than 18 characters total
+	if (/^[bcdfghjklmnpqrstvwxyz]{4}$/.test(roomInput) && /^[a-zA-Z0-9_.-]*$/.test(input) && input !== '' && input.length < 18) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+// HOST METHODS
+
 let generateBackronym = (lf) => {
 	let backronym = [];
 
@@ -137,6 +153,7 @@ let presentCategoryChoices = (categories, categoryHead) => {
 
 let GameLogicObj = {
 	// startGame: startGame,
+	checkJoinInput: checkJoinInput,
 	shuffleCategories: shuffleCategories,
 	presentCategoryChoices: presentCategoryChoices,
 	generateBackronym: generateBackronym,

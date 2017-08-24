@@ -3,3 +3,29 @@ ul {
 	text-decoration: none;
 	padding: 0;
 }
+
+#instructions-container {
+	width: 33%;
+    margin: 0 auto;
+}
+
+.instructions-text {
+	margin: 0;
+	text-align: left;
+}
+
+.instructions-header {
+	margin-bottom: 3px;
+}
+
+#ready-button{
+	margin-top: 18px;
+}
+
+#main-header {
+	margin-bottom: 2px;
+}
+
+#sub-header {
+	margin-top: 0px;
+}

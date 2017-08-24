@@ -148,7 +148,11 @@ class GameHost extends React.Component {
 		//  or all of the votes were submitted before the timer was actually complete,
 		//  which will call this method as well
 
+		console.log('voting timer complete');
+
 		if (this.votingTimerCompletePassthrough === true) {
+
+			console.log('voting timer complete: inside');			
 
 			// Prevents double triggers of this method
 			this.votingTimerCompletePassthrough = false;
@@ -301,45 +305,6 @@ class GameHost extends React.Component {
 				'categoryHead': this.state.categoryHead + 3,
 				currentRound: modifiedCurrentRound
 			})
-
-			// GameLogic.startGame(3000, this.state.room.players)
-			// 	.then(res => {
-			// 		// When the game start is complete, emit that the res
-			// 		//  the judge of the game, as well as the choices of categories
-			// 		let categoryChoices = GameLogic.presentCategoryChoices(this.state.categories, this.state.categoryHead);
-
-			// 		// Figuring out who the judge is, and offering that device the three category choices
-			// 		socket.emit('host:round-start', this.state.room.roomCode, res.socketID, res.name, categoryChoices);
-
-			// 		// Save the judge into state
-			// 		let modifiedCurrentRound = this.state.currentRound;
-			// 		modifiedCurrentRound.judge.name = res.name;
-			// 		modifiedCurrentRound.judge.socketID = res.socketID;
-
-			// 		// Create a new score-card and add to modifiedCurrentRound
-			// 		let newScore = [];
-			// 		for (let i = 0; i < this.state.room.players.length; i++) {
-			// 			let scoreObj = {
-			// 				'name': this.state.room.players[i].name,
-			// 				'socketID': this.state.room.players[i].socketID,
-			// 				'score': 0
-			// 			}
-			// 			newScore.push(scoreObj);
-			// 		}
-			// 		modifiedCurrentRound.score = newScore;
-
-			// 		// Set the round number to 1 (since new game)
-			// 		modifiedCurrentRound.round = 1;
-
-			// 		// Save judge + category head + scoreCard
-			// 		this.setState({
-			// 			'categoryHead': this.state.categoryHead + 3,
-			// 			currentRound: modifiedCurrentRound
-			// 		})
-			// 	})
-			// 	.catch(err => {
-			// 		console.log(err);
-			// 	})
 		});
 	}
 
@@ -363,6 +328,7 @@ class GameHost extends React.Component {
 
 		// Create a fresh/new 'currentRound' object
 		this.setState({
+			'gameState' : 'gameIntro',
 			'currentRound': {
 				'round': newRoundNumber,
 				'score': newScore,
@@ -410,6 +376,22 @@ class GameHost extends React.Component {
 	}
 
 	setSocketListeners() {
+
+		// When the room is freshly made...
+		socket.on('host:make-room', roomCode => {
+			console.log(`>> host:make-room: ${roomCode}`);
+
+			// Fetch the room object and the 'players' array within
+			let modifiedRoom = this.state.room;
+			modifiedRoom.roomCode = roomCode.toLowerCase();
+			modifiedRoom.host = socket.id;
+
+			// Save state of room
+			this.setState({
+				room: modifiedRoom
+			})
+		})
+
 		// When a new player has joined into the game, 
 		//  add their information into this room's data
 		socket.on('host:join-room-success', data => {
@@ -425,8 +407,8 @@ class GameHost extends React.Component {
 				socketID: data.socket
 			})
 			// In the parent 'room' object, add in the modifiedPlayers array
-			modifiedRoom.roomCode = this.props.roomCode.toLowerCase();
-			modifiedRoom.host = socket.id;
+			// modifiedRoom.roomCode = this.props.roomCode.toLowerCase();
+			// modifiedRoom.host = socket.id;
 			modifiedRoom.players = modifiedPlayers;
 
 			// Set to state the newly modifiedRoom
@@ -541,7 +523,7 @@ class GameHost extends React.Component {
 				break;
 			}
 			case 'gameIntro': {
-				toRender = <StateGameIntro room={this.state.room} />
+				toRender = <StateGameIntro round={this.state.currentRound}/>
 				break;
 			}
 			case 'roundStart': {
@@ -568,7 +550,7 @@ class GameHost extends React.Component {
 				)
 				break;
 			}
-			case 'newRoundIdle' :{
+			case 'newRoundIdle': {
 				toRender = (
 					<StateNewRoundIdle />
 				)

@@ -10,7 +10,7 @@ class StateRoundInProgress extends React.Component {
 			'submission': '',
 			'showError': false,
 			'showEntry': false,
-			'errorMessage' : ''
+			'errorMessage': ''
 		}
 
 		this.onFormChange = this.onFormChange.bind(this);
@@ -22,7 +22,7 @@ class StateRoundInProgress extends React.Component {
 		})
 	}
 
-	componentDidMount(){
+	componentDidMount() {
 		console.log(this.props.socketID);
 	}
 
@@ -37,6 +37,25 @@ class StateRoundInProgress extends React.Component {
 			headerJSX = (
 				<div>
 					<h1>{this.props.judge.name} is the judge!</h1>
+				</div>
+			)
+		}
+
+		let subtextJSX;
+		if (this.props.socketID === this.props.judge.socketID) {
+			subtextJSX = (
+				<div className='subtext-container'>
+					<p className='description-text'>- your votes are worth more!</p>
+					<p className='description-text'>- for now, enter a backronym for the category below:</p>
+				</div>
+			)
+		}
+		else {
+			subtextJSX = (
+				<div className='subtext-container'>
+					<p className='description-text'>- your goal is to get the most votes for your backronym!</p>
+					<p className='description-text'>- a backronym is a phrase where each starting letter begins with the corresponding letter below</p>
+					<p className='description-text'>- someone help me fix that description above because it's bad</p>					
 				</div>
 			)
 		}
@@ -58,14 +77,15 @@ class StateRoundInProgress extends React.Component {
 		return (
 			<div>
 				{headerJSX}
-				<hr />
+				{subtextJSX}
+				<hr className='horizontal-rule' />
 				<h3>{this.props.category}</h3>
 				<h1>{this.props.backronym.toUpperCase()}</h1>
 				{showEntryJSX}
-				<hr />
+				<hr className='horizontal-rule' />
 				{showErrorJSX}
 				<form id='form'>
-					<input value={this.state.input} onChange={this.onFormChange}>
+					<input id='input' value={this.state.input} onChange={this.onFormChange}>
 					</input>
 					<button onClick={(event) => {
 						this.props.submitBackronym(event, this.state.input, this.state.submission)
@@ -77,10 +97,10 @@ class StateRoundInProgress extends React.Component {
 								})
 							})
 							.catch(rej => {
-								if (rej.code.toString()[0] !== '3'){
+								if (rej.code.toString()[0] !== '3') {
 									this.setState({
 										'showError': true,
-										'errorMessage' : rej.message
+										'errorMessage': rej.message
 									})
 								}
 							});
