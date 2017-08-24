@@ -1,5 +1,4 @@
 import React from 'react';
-// import axios from 'axios';
 import './css/GamePlayer.css';
 import GameLogic from '../GameLogic'
 import StateLobbyPregame from './LobbyPregame'
@@ -40,6 +39,7 @@ class GamePlayer extends React.Component {
 		this.selectCategory = this.selectCategory.bind(this);
 		this.checkForCategoryAndBackronym = this.checkForCategoryAndBackronym.bind(this);
 		this.submitBackronym = this.submitBackronym.bind(this);
+		this.submitVote = this.submitVote.bind(this);
 	}
 
 	componentDidMount() {
@@ -47,6 +47,10 @@ class GamePlayer extends React.Component {
 
 		// Initialize the state
 		this.setState({
+			'player' : {
+				'name' : this.props.nameInput,
+				'socketID' : ''
+			},
 			'roomCode': this.props.roomInput.toLowerCase()
 		}, () => {
 			// After the host socket is created, 
@@ -69,6 +73,16 @@ class GamePlayer extends React.Component {
 		//  the waiting lobby, change state to 'gameStarting'
 		socket.on('host:game-intro-starting', () => {
 			console.log(`>> host:game-intro-starting`);
+
+			// A connection has been established -- set state with
+			//  the player's socketID
+			let modifiedPlayer = this.state.player;
+			modifiedPlayer.socketID = socket.id;
+
+			// Save state
+			this.setState({
+				'player' : modifiedPlayer
+			});
 		});
 
 		socket.on('host:round-start', (judgeSocketID, judgeName, categoryChoices) => {
@@ -164,6 +178,17 @@ class GamePlayer extends React.Component {
 		})
 	}
 
+	// When a player presses a button on the voting screen,
+	//  locking in their vote for a certain backronym
+	submitVote(event,index,name,socketID){
+
+		// Prevent the button from performing regular functionality
+		event.preventDefault();
+
+		// Emit to host about the vote that was just submitted
+		socket.emit('player:submit-vote',this.state.roomCode,index,name,socketID);
+	}
+
 	render() {
 		let toRender;
 		switch (this.state.gameState) {
@@ -200,7 +225,7 @@ class GamePlayer extends React.Component {
 				break;
 			}
 			case 'playerVoting' : {
-				toRender = <StatePlayerVoting submissions={this.state.submissions}/>
+				toRender = <StatePlayerVoting submitVote={this.submitVote} name={this.state.player.name} socketID={socket.id} submissions={this.state.submissions}/>
 				break;
 			}
 		}

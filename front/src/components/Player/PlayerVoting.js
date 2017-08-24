@@ -1,27 +1,57 @@
 import React from 'react';
 import './css/PlayerVoting.css';
 
-function StatePlayerVoting(props) {
-	console.log(props.submissions);
+class StatePlayerVoting extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+			voteSelected: false,
+			entry: ''
+		}
+	}
+	render() {
+		let headerJSX = null;
+		let renderJSX = null;
+		if (this.state.voteSelected === false) {
+			headerJSX = (
+				<div>
+					<h1>vote for your favourite!</h1>
+					<p>you get more points if your vote matches the judge's vote</p>
+					<hr />
+				</div>
+			)
+			renderJSX = this.props.submissions.reduce((acc, el, i) => {
+				if (el.socketID !== this.props.socketID) {
+					acc.push(<li key={i}><button onClick={(event) => {
+						this.props.submitVote(event, i, this.props.name, this.props.socketID);
+						this.setState({
+							voteSelected: true,
+							entry: el.entry
+						})
+					}}key={i}>{el.entry}</button></li>);
+				}
+				return acc;
+			}, []);
+		}
+		else {
+			renderJSX = (
+				<div>
+					<p>you voted:</p>
+					<h3>{this.state.entry}</h3>
+					<p>no takeback-sies!</p>
+				</div>
+			)
+		}
 
-	let resultsJSX = props.submissions.map((el,i)=>{
 		return (
-			<li key={i}><button key={i}>{el.entry}</button></li>
+			<div>
+				{headerJSX}
+				<ul>
+					{renderJSX}
+				</ul>
+			</div>
 		)
-	})
-
-	// let horizontalRuleJSX = props.submissions.length > 0 ? <hr /> : <div></div>;
-
-	return (
-		<div>
-			<h1>pick your favourite!</h1>
-			<p>you get more points if your vote matches the judge's vote</p>
-			<hr />
-			<ul>
-				{resultsJSX}
-			</ul>
-		</div>
-	)
+	}
 }
 
 export default StatePlayerVoting;

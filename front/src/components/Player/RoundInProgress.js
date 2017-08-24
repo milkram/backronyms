@@ -22,6 +22,10 @@ class StateRoundInProgress extends React.Component {
 		})
 	}
 
+	componentDidMount(){
+		console.log(this.props.socketID);
+	}
+
 	render() {
 		let headerJSX;
 		if (this.props.socketID === this.props.judge.socketID) {

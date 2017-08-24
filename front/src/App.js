@@ -44,8 +44,8 @@ class App extends Component {
 	
 	startHosting() {
 		// Connect the hosting client
-		// socket = io('http://localhost:3100');
-		socket = io('54.218.83.100');
+		socket = io('http://localhost:3100');
+		// socket = io('54.218.83.100');
 		socket.connect();
 		socket.emit('host:make-room', this.state.roomCode.toLowerCase());
 	}
@@ -54,7 +54,8 @@ class App extends Component {
 		// Using a regex to check if this.state.roomInput is
 		//  4 characters and uses only consonants
 		if (/^[bcdfghjklmnpqrstvwxyz]{4}$/.test(this.state.roomInput.toLowerCase()) && this.state.nameInput !== '') {
-			socket = io('54.218.83.100');
+			socket = io('http://localhost:3100');
+			// socket = io('54.218.83.100');
 			socket.connect();
 			socket.emit('player:join-room', {
 				'roomCode': this.state.roomInput.toLowerCase(),
@@ -71,8 +72,8 @@ class App extends Component {
 		for (var i = 0; i < 4; i++) {
 			text += possible.charAt(Math.floor(Math.random() * possible.length));
 		}
-		// axios.get('http://localhost:3100/make/' + text)
-		axios.get('/make/' + text)
+		axios.get('http://localhost:3100/make/' + text)
+		// axios.get('/make/' + text)
 			.then(res => {
 				this.setState({
 					roomCode: text
@@ -103,7 +104,7 @@ class App extends Component {
 						'nameInput': this.state.nameInput,
 						'joinRoom': this.joinRoom,
 						// Game+Host Clients
-						'socket' : socket,
+						'socket' : socket
 						// Game Client Specific
 						// Host Client Specific
 						 })}

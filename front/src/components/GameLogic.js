@@ -1,20 +1,20 @@
 // Host Methods
-let startGame = (time, players) => {
-	// Select judge function to figure out who the judge is.
-	//  Everyone else will be selected as players.
-	function selectJudge() {
-		// Selecting the judge
-		return (players[Math.floor(Math.random() * players.length)]);
-	}
-	return new Promise(function (resolve, reject) {
-		setTimeout(() => {
-			resolve(
-				// Selecting the judge for the round
-				selectJudge()
-			);
-		}, time);
-	})
-}
+// let startGame = (time, players) => {
+// 	// Select judge function to figure out who the judge is.
+// 	//  Everyone else will be selected as players.
+// 	function selectJudge() {
+// 		// Selecting the judge
+// 		return (players[Math.floor(Math.random() * players.length)]);
+// 	}
+// 	return new Promise(function (resolve, reject) {
+// 		setTimeout(() => {
+// 			resolve(
+// 				// Selecting the judge for the round
+// 				selectJudge()
+// 			);
+// 		}, time);
+// 	})
+// }
 
 let generateBackronym = (lf) => {
 	let backronym = [];
@@ -136,7 +136,7 @@ let presentCategoryChoices = (categories, categoryHead) => {
 }
 
 let GameLogicObj = {
-	startGame: startGame,
+	// startGame: startGame,
 	shuffleCategories: shuffleCategories,
 	presentCategoryChoices: presentCategoryChoices,
 	generateBackronym: generateBackronym,

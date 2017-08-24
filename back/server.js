@@ -258,6 +258,29 @@ io.on('connection', socket => {
 		console.log(`>> [${roomCode}] host:submission-round-complete: : (${submissions.length}/${totalPlayers})`);
 		socket.to(roomCode).emit('host:submission-round-complete', submissions);
 	})
+
+	// When a player has submitted a vote...
+	socket.on('player:submit-vote', (roomCode,index,name,socketID)=>{
+		for (let i = 0; i < rooms.length; i++) {
+			if (rooms[i].roomCode === roomCode) {
+				// Send the data to the host of the found roomCode
+				socket.to(rooms[i].host).emit('player:submit-vote', index, name, socketID);
+				break;
+			}
+		}
+	});
+
+	// When the voting round is complete (either via timer or via everyone finishing ahead of time)...
+	socket.on('host:voting-round-complete', (roomCode, submissions, totalPlayers)=>{
+
+		// Counting the amount of votes
+		let numberOfVotes = 0;
+		for (let i = 0; i < submissions.length; i++) {
+			numberOfVotes += submissions[i].votes.length;
+		}
+		console.log(`>> [${roomCode}] host:voting-round-complete: : (${numberOfVotes}/${totalPlayers})`);
+		socket.to(roomCode).emit('host:voting-round-complete', submissions);
+	});
 });
 
 app.get('*',(req,res)=>{
