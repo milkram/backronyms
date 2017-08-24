@@ -33,7 +33,7 @@ function StateResults(props) {
 
 	let resultsJSX = props.submissions.map((el, i) => {
 		return (
-			<div className='score-container'>
+			<div key={i} className='score-container'>
 				<div className='score-name'>
 					<strong>{el.name}</strong>:
 				</div>

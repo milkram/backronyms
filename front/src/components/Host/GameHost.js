@@ -105,8 +105,8 @@ class GameHost extends React.Component {
 	}
 
 	getCategories() {
-		// axios.get('http://localhost:3100/categories')
-			axios.get('/categories')
+		axios.get('http://localhost:3100/categories')
+			// axios.get('/categories')
 			.then(res => {
 				this.setState({
 					'categories': GameLogic.shuffleCategories(res.data)
@@ -115,8 +115,8 @@ class GameHost extends React.Component {
 	}
 
 	getLetterFrequencies() {
-		// axios.get('http://localhost:3100/letterfreqs')
-			axios.get('/letterfreqs')
+		axios.get('http://localhost:3100/letterfreqs')
+			// axios.get('/letterfreqs')
 			.then(res => {
 				this.setState({
 					'letterFrequencies': res.data
@@ -148,12 +148,7 @@ class GameHost extends React.Component {
 		//  or all of the votes were submitted before the timer was actually complete,
 		//  which will call this method as well
 
-		console.log('voting timer complete');
-
 		if (this.votingTimerCompletePassthrough === true) {
-
-			console.log('voting timer complete: inside');			
-
 			// Prevents double triggers of this method
 			this.votingTimerCompletePassthrough = false;
 
@@ -328,7 +323,7 @@ class GameHost extends React.Component {
 
 		// Create a fresh/new 'currentRound' object
 		this.setState({
-			'gameState' : 'gameIntro',
+			'gameState': 'gameIntro',
 			'currentRound': {
 				'round': newRoundNumber,
 				'score': newScore,
@@ -452,13 +447,32 @@ class GameHost extends React.Component {
 			let modifiedCurrentRound = this.state.currentRound;
 			let modifiedSubmissions = this.state.currentRound.submissions;
 
-			// Add the entry to the submissions array
-			modifiedSubmissions.push({
-				'name': playerName,
-				'socketID': socketID,
-				'entry': backronym,
-				'votes': []
-			})
+			// Loop through all of the existing submissions --
+			//  if there's a match, _replace_ instead of push
+			let doPush = true;
+			for (let i = 0; i < modifiedSubmissions.length; i++) {
+				if (modifiedSubmissions[i].socketID === socketID) {
+					doPush = false;
+					modifiedSubmissions.splice(i, 1, {
+						'name': playerName,
+						'socketID': socketID,
+						'entry': backronym,
+						'votes': []
+					})
+				}
+			}
+
+			// Add the entry to the submissions array, IF
+			//  there's not a match of sockets - in which case
+			//  replace instead
+			if (doPush) {
+				modifiedSubmissions.push({
+					'name': playerName,
+					'socketID': socketID,
+					'entry': backronym,
+					'votes': []
+				})
+			}
 
 			// Add the submissions array to the currentRound
 			modifiedCurrentRound.submissions = modifiedSubmissions;
@@ -523,7 +537,7 @@ class GameHost extends React.Component {
 				break;
 			}
 			case 'gameIntro': {
-				toRender = <StateGameIntro round={this.state.currentRound}/>
+				toRender = <StateGameIntro round={this.state.currentRound} />
 				break;
 			}
 			case 'roundStart': {
