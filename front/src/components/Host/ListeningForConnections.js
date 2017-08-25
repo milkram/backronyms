@@ -62,7 +62,7 @@ class StateListeningForConnections extends React.Component {
 		let instructionsJSX = (
 			<div id='instructions-container'>
 				<h4 className='instructions-header'>how to join:</h4>
-				<p className='instructions-text'>- navigate to http://54.218.83.100/</p>
+				<p className='instructions-text'>- navigate to http://b.milkram.com/</p>
 				<p className='instructions-text'>- type in room code: <strong>{roomCode.toUpperCase()}</strong></p>
 				<p className='instructions-text'>- type in your silly name</p>
 				<p className='instructions-text'>- tell your friends!</p>
