@@ -10,13 +10,13 @@ class StateListeningForConnections extends React.Component {
 		// Defining variables
 		let _playersInRoom = 0;
 
-		// let headerJSX = (
-		// 	<div>
-		// 		<h1 style={{ marginBottom: '0' }}>backronyms</h1>
-		// 		<p style={{ margin: '0' }}>the game of making something from nothing</p>
-		// 		<hr className="horizontal-rule" />
-		// 	</div>
-		// );
+		let headerJSX = (
+			<div>
+				<h1 style={{ marginBottom: '0' }}>backronyms</h1>
+				<p style={{ margin: '0' }}>the game of making something from nothing</p>
+				<hr className="horizontal-rule" />
+			</div>
+		);
 
 		// Populating arrayJSX with the name of each
 		//  player that joins into the room
@@ -73,7 +73,7 @@ class StateListeningForConnections extends React.Component {
 
 		return (
 			<div>
-				{/* {headerJSX} */}
+				{headerJSX}
 				<h2 id='main-header'>we're waiting for connections!</h2>
 				<p id='sub-header'>minimum 3 players, maximum of who knows!</p>
 				<hr className='horizontal-rule' />
