@@ -121,7 +121,7 @@ let checkBackronym = (backronym, entry, existingSubmission) => {
 	// console.log(`entrySplit: ${entrySplit}`);
 
 	if (backronymSplit.length !== entrySplit.length) {
-		console.log('FALSE: not the same amount of words')
+		// console.log('FALSE: not the same amount of words')
 		return {
 			'valid': false,
 			'message': 'invalid backronym submitted, try again',
@@ -131,7 +131,7 @@ let checkBackronym = (backronym, entry, existingSubmission) => {
 	for (let i = 0; i < backronymSplit.length; i++) {
 		// Checking if the first letters match
 		if (entrySplit[i][0] !== backronymSplit[i]) {
-			console.log('FALSE: first letters don\'t match');
+			// console.log('FALSE: first letters don\'t match');
 			return {
 				'valid': false,
 				'message': 'invalid backronym submitted, try again',

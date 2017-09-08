@@ -84,7 +84,7 @@ function StateResults() {
 	let displayBackronym = function () {
 		var promise = new Promise (function(resolve,reject){
 			setTimeout(function(){
-				console.log('display backronym');
+				// console.log('display backronym');
 				resolve()
 			},500);
 		});
@@ -93,7 +93,7 @@ function StateResults() {
 	let displayEntries = function () {
 		var promise = new Promise (function(resolve,reject){
 			setTimeout(function(){
-				console.log('display backronym');
+				// console.log('display backronym');
 				resolve()
 			},300);
 		});
@@ -102,7 +102,7 @@ function StateResults() {
 	let displayVotes = function () {
 		var promise = new Promise (function(resolve,reject){
 			setTimeout(function(){
-				console.log('display backronym');
+				// console.log('display backronym');
 				resolve()
 			},600);
 		});

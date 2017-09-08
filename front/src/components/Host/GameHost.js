@@ -105,8 +105,8 @@ class GameHost extends React.Component {
 	}
 
 	getCategories() {
-		axios.get('http://localhost:3100/categories')
-			// axios.get('/categories')
+		// axios.get('http://localhost:3100/categories')
+		axios.get('/categories')
 			.then(res => {
 				this.setState({
 					'categories': GameLogic.shuffleCategories(res.data)
@@ -115,8 +115,8 @@ class GameHost extends React.Component {
 	}
 
 	getLetterFrequencies() {
-		axios.get('http://localhost:3100/letterfreqs')
-			// axios.get('/letterfreqs')
+		// axios.get('http://localhost:3100/letterfreqs')
+		axios.get('/letterfreqs')
 			.then(res => {
 				this.setState({
 					'letterFrequencies': res.data

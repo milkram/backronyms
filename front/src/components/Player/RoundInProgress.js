@@ -23,7 +23,7 @@ class StateRoundInProgress extends React.Component {
 	}
 
 	componentDidMount() {
-		console.log(this.props.socketID);
+		// console.log(this.props.socketID);
 	}
 
 	render() {

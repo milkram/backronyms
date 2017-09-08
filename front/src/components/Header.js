@@ -2,9 +2,6 @@ import React from 'react';
 import './css/Header.css';
 
 function Header(props) {
-	console.log('ver');
-	console.log(process.env);
-
 	let headerJSX = (
 		<div>
 			<h1 style={{ marginBottom: '0' }}>backronyms v0.1.5</h1>

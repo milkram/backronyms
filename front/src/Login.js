@@ -26,8 +26,6 @@ class Login extends React.Component {
 						this.props.router.push('gameplayer');
 					})
 					.catch(rej => {
-						console.log('rej');
-						console.log(rej);
 						this.setState({
 							'showError': true,
 							'errorMessage': rej.errorMessage
