@@ -1,31 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router';
 import './css/Host.css';
+import Header from './components/Header';
 
 function Home (props) {
-	let headerJSX = (
-		<div>
-			<h1 style={{ marginBottom: '0' }}>backronyms</h1>
-			<p style={{ margin: '0' }}>the game of making something from nothing</p>
-			<hr className="horizontal-rule" />
-		</div>
-	);
-
 	return (
 		<div>
-			{headerJSX}
+			<Header />
 			<div id="form-container">
 				<div>
-					<h2 className="form-header inline-block">room code:</h2>
-					<h2 className="no-margins inline-block">{props.roomCode}</h2>
-					<button onClick={props.setNewRoomCode} id="change-room-code-button">change room code</button>
-					{/* <button id="start-button"><Link to='gamehost' id='link-start-game'>start hosting</Link></button> */}
-					<button onClick={props.startHosting} id="start-button"><Link to='gamehost' id='link-start-game'>start hosting</Link></button>					
-					{/* <button onClick={props.startHosting} id="start-button">start hosting</button> */}
+					<button onClick={props.startHosting} id="start-button"><Link to='gamehost' id='link-start-game' style={{color:'black'}}>start hosting</Link></button>
+					<h4 style={{width:'30%', margin:'12px auto 0 auto', fontSize:'12px',fontWeight:'100'}}>host a game on a separate tab, then have your players join via their phones or computers with the room code from the next screen</h4>
 				</div>
 			</div>
 			<hr id="horizontal-rule" />
-			<Link to="/">join a game?</Link>
+			<Link to="/" style={{color:'black'}}>join a game?</Link>
 		</div>
 	)
 }

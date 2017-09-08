@@ -45,8 +45,8 @@ class App extends Component {
 
 	startHosting() {
 		// Connect the hosting client
-		// socket = io('http://localhost:3100');
-		socket = io('54.218.83.100');
+		socket = io('http://localhost:3100');
+		// socket = io('54.218.83.100');
 		socket.connect();
 		socket.emit('host:make-room', this.state.roomCode.toLowerCase());
 	}
@@ -57,49 +57,36 @@ class App extends Component {
 
 		// Return a promise
 		return new Promise((resolve, reject) => {
-			let isValid = GameLogic.checkJoinInput(this.state.roomInput.toLowerCase(),this.state.nameInput);
-			if (isValid === true) {
-				// socket = io('http://localhost:3100');
-				socket = io('54.218.83.100');
-				socket.connect();
-				socket.emit('player:join-room', {
-					'roomCode': this.state.roomInput.toLowerCase(),
-					'name': this.state.nameInput
-					// 'socket' : socket -- this causes an error
+
+			// Checking if the name is valid
+			let isValid = GameLogic.checkJoinInput(this.state.roomInput.toLowerCase(), this.state.nameInput);
+
+			// Checking if the room already exists or not 
+			GameLogic.checkIfRoomExists(this.state.roomInput.toLowerCase())
+				.then(exists => {
+					if (exists === true) {
+						if (isValid === true) {
+							socket = io('http://localhost:3100/');
+							// socket = io('54.218.83.100');
+							socket.connect();
+							socket.emit('player:join-room', {
+								'roomCode': this.state.roomInput.toLowerCase(),
+								'name': this.state.nameInput
+							});
+
+							resolve(true);
+						}
+						else {
+							reject({'errorMessage': 'name is invalid -- max 16 chars, no spaces or special characters.' });
+						}
+					}
+					else {
+						reject({'errorMessage': 'room does not exist. host a room before joining!' });
+					}
+				})
+				.catch(err => {
+					reject({'errorMessage': 'error occurred, please refresh and try to join again.'});
 				});
-
-				resolve(true);
-
-				// // Using a regex to check if this.state.roomInput is
-				// //  4 characters and uses only consonants
-				// if (/^[bcdfghjklmnpqrstvwxyz]{4}$/.test(this.state.roomInput.toLowerCase()) && this.state.nameInput !== '') {
-				// 	socket = io('http://localhost:3100');
-				// 	// socket = io('54.218.83.100');
-				// 	socket.connect();
-				// 	socket.emit('player:join-room', {
-				// 		'roomCode': this.state.roomInput.toLowerCase(),
-				// 		'name': this.state.nameInput
-				// 		// 'socket' : socket -- this causes an error
-				// 	});
-				// }
-
-				// // Submit to the server the verified backronym
-				// socket.emit('player:submit-backronym', this.state.roomCode, returnObj.entry, socket.id);
-
-				// resolve({
-				// 	'entry': returnObj.entry,
-				// 	'code': returnObj.code
-				// });
-			}
-			else {
-				reject(false);
-
-				// reject({
-				// 	'valid': false,
-				// 	'message': returnObj.message,
-				// 	'code': returnObj.code
-				// });
-			}
 		})
 	}
 
@@ -110,8 +97,8 @@ class App extends Component {
 		for (var i = 0; i < 4; i++) {
 			text += possible.charAt(Math.floor(Math.random() * possible.length));
 		}
-		// axios.get('http://localhost:3100/make/' + text)
-			axios.get('/make/' + text)
+		axios.get('http://localhost:3100/make/' + text)
+			// axios.get('/make/' + text)
 			.then(res => {
 				this.setState({
 					roomCode: text

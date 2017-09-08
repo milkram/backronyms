@@ -169,6 +169,20 @@ app.get('/letterfreqs', (req, res) => {
 	res.send(letterFrequencies);
 })
 
+app.get('/exists/:roomCode', (req, res) => {
+	// Checking to see if the room exists -- else return error
+	let exists = false;
+	for (let i = 0; i < rooms.length; i++) {
+		if (rooms[i].roomCode === req.params.roomCode) {
+			exists = true;
+		}
+		else {
+			exists = false;
+		}
+	}
+	res.send(exists);
+})
+
 // Defining what happens on a successful server+io connection
 io.on('connection', socket => {
 
@@ -182,7 +196,7 @@ io.on('connection', socket => {
 		console.log(`>> [${roomCode}] host:make-room`);
 		socket.join(roomCode);
 		rooms.push({ 'roomCode': roomCode, 'host': socket.id, 'players': [] });
-		io.to(socket.id).emit('host:make-room',roomCode);
+		io.to(socket.id).emit('host:make-room', roomCode);
 	});
 
 	// When the host presses the 'start game' button,
@@ -261,7 +275,7 @@ io.on('connection', socket => {
 	})
 
 	// When a player has submitted a vote...
-	socket.on('player:submit-vote', (roomCode,index,name,socketID)=>{
+	socket.on('player:submit-vote', (roomCode, index, name, socketID) => {
 		for (let i = 0; i < rooms.length; i++) {
 			if (rooms[i].roomCode === roomCode) {
 				// Send the data to the host of the found roomCode
@@ -272,7 +286,7 @@ io.on('connection', socket => {
 	});
 
 	// When the voting round is complete (either via timer or via everyone finishing ahead of time)...
-	socket.on('host:voting-round-complete', (roomCode, submissions, totalPlayers)=>{
+	socket.on('host:voting-round-complete', (roomCode, submissions, totalPlayers) => {
 
 		// Counting the amount of votes
 		let numberOfVotes = 0;
@@ -284,7 +298,7 @@ io.on('connection', socket => {
 	});
 });
 
-app.get('*',(req,res)=>{
+app.get('*', (req, res) => {
 	res.sendFile(path.resolve(__dirname + './../front/build/index.html'));
 });
 

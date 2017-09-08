@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 // Host Methods
 // let startGame = (time, players) => {
 // 	// Select judge function to figure out who the judge is.
@@ -28,6 +30,24 @@ let checkJoinInput = (roomInput, input) => {
 	else {
 		return false;
 	}
+}
+
+let checkIfRoomExists = (roomInput) => {
+	return new Promise(function (resolve, reject) {
+		// axios.get('http://localhost:3100/exists/' + roomInput)
+		axios.get('/exists/' + roomInput)
+			.then(exists => {
+				if (exists.data === true){
+					resolve(true);
+				}
+				else {
+					resolve(false);
+				}
+			})
+			.catch(existsFalse => {
+				resolve(false);
+			});
+	})
 }
 
 // HOST METHODS
@@ -157,7 +177,8 @@ let GameLogicObj = {
 	shuffleCategories: shuffleCategories,
 	presentCategoryChoices: presentCategoryChoices,
 	generateBackronym: generateBackronym,
-	checkBackronym: checkBackronym
+	checkBackronym: checkBackronym,
+	checkIfRoomExists: checkIfRoomExists
 	// startRoundTimer: startRoundTimer
 }
 

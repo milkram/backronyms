@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/Login.css';
 import { Link } from 'react-router';
+import Header from './components/Header';
 
 class Login extends React.Component {
 	constructor() {
@@ -10,21 +11,13 @@ class Login extends React.Component {
 			// 'submission': '',
 			'showError': false,
 			// 'showEntry': false,
-			'errorMessage': 'please enter a valid room code/name input',
+			'errorMessage': '',
 			'redirect': false,
 			'redirecting': false
 		}
 	}
 
 	render() {
-		let headerJSX = (
-			<div>
-				<h1 style={{ marginBottom: '0' }}>backronyms</h1>
-				<p style={{ margin: '0' }}>the game of making something from nothing</p>
-				<hr className="horizontal-rule" />
-			</div>
-		);
-
 		let joinGameButtonJSX = (
 			<button id='start-button' onClick={(event) => {
 				this.props.joinRoom(event)
@@ -33,8 +26,11 @@ class Login extends React.Component {
 						this.props.router.push('gameplayer');
 					})
 					.catch(rej => {
+						console.log('rej');
+						console.log(rej);
 						this.setState({
-							'showError': true
+							'showError': true,
+							'errorMessage': rej.errorMessage
 						})
 					});
 			}}>
@@ -57,7 +53,6 @@ class Login extends React.Component {
 					</form>
 				</div>
 				{joinGameButtonJSX}
-				{/* <button onClick={props.joinRoom} id="start-button"><Link to='gameplayer' id='link-join-game'>join game</Link></button> */}
 			</div>
 		)
 
@@ -70,11 +65,12 @@ class Login extends React.Component {
 
 		return (
 			<div>
-				{headerJSX}
+				<Header />
 				{formContainerJSX}
 				{showErrorJSX}
 				<hr className="horizontal-rule" />
-				<Link to="/host">host a game?</Link>
+				<h4 style={{fontSize:'12px', margin:'0 0 3px 0', fontWeight:'300'}}>NOTE: Someone needs to host a room before you can join it!</h4>				
+				<Link to="/host" style={{color:'black'}}>host a game?</Link>
 			</div>
 		)
 	}
